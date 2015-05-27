@@ -1,0 +1,19 @@
+[package]
+name = "glr-parser"
+version = "0.0.1"
+authors = ["qdwang <wangqidong@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/qdwang/glr-parser-rs"
+documentation = "https://github.com/qdwang/glr-parser-rs"
+homepage = "https://github.com/qdwang/glr-parser-rs"
+description = """
+An implementation of GLR parser generator for Rust.
+"""
+
+[[test]]
+name = "glr"
+path = "src/test.rs"
+
+[dependencies]
+regex = "0.1.30"
