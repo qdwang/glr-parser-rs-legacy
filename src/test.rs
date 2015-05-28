@@ -309,7 +309,8 @@ fn test_python(){
         ]
     });
 
-    println!("Generating Action, Goto tables, please wait...(In real world, you can serialize the parsing table to binary file)");
+    println!("Generating Action, Goto tables, please wait...");
+    println!("(In real world, release mode is much faster and you can serialize the parsing table to binary file)");
     let (action, goto) = glr::create_table(&grammar_hashmap, initial_item);
 
     let mut trees = glr::parse(lex, action, goto);
@@ -402,4 +403,5 @@ fn verbose_test(){
     test_if_else();
     test_non_deterministic();
     test_non_deterministic2();
+    // test_python();
 }
