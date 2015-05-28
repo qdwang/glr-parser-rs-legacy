@@ -396,10 +396,10 @@ fn test_json(){
 
 #[test]
 fn verbose_test(){
-    // test_list_pair();
-    // test_termianl_reduce();
-    // test_json();
+    test_list_pair();
+    test_termianl_reduce();
+    test_json();
     test_if_else();
-    // test_non_deterministic();
-    // test_non_deterministic2();
+    test_non_deterministic();
+    test_non_deterministic2();
 }

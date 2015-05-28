@@ -161,6 +161,47 @@ fn get_first(grammars_hashmap: &HashMap<String, Vec<Arc<GrammarItem>>>, symbol: 
 //     }
 //     false
 // }
+
+fn get_real_productions(grammars_hashmap: &HashMap<String, Vec<Arc<GrammarItem>>>, 
+                        production: &Vec<Arc<Atom>>) -> Vec<Vec<Arc<Atom>>> {
+    let mut ret: Vec<Vec<Arc<Atom>>> = vec![vec![]];
+    for item in production.iter() {
+        let mut split = false;
+        match **item {
+            Atom::Symbol(ref x) => {
+                if let Some(atom_str) = x.find('~') {
+                    if let Some(grammar_items) = grammars_hashmap.get(&**x) {
+                        for item in grammar_items {
+                            if item.production.len() == 0 {
+                                split = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            },
+            Atom::Terminal(ref x) => {}
+        }
+
+        if !split {
+            for each_ret in &mut ret {
+                each_ret.push(item.clone());
+            }
+        } else {
+            let mut ret_extend: Vec<Vec<Arc<Atom>>> = vec![];
+            for each_ret in ret.iter() {
+                ret_extend.push(each_ret.clone());
+            }  
+
+            for each_ret in &mut ret {
+                each_ret.push(item.clone());
+            }
+
+            ret.extend(ret_extend);
+        }
+    }
+    ret
+}
 fn find_solid_indexes(grammars_hashmap: &HashMap<String, Vec<Arc<GrammarItem>>>, 
                         production: &Vec<Arc<Atom>>, 
                         start_index: u8,
@@ -201,7 +242,7 @@ fn get_closure(grammars_hashmap: &HashMap<String, Vec<Arc<GrammarItem>>>,
     let mut ret: Vec<Arc<LRItem>> = Vec::new();
     let mut ret_cache: HashSet<Arc<LRItem>> = HashSet::new();
 
-        println!("initial_items {:?}", initial_items.clone());
+        // println!("initial_items {:?}", initial_items.clone());
     let mut working_items = initial_items;
 
     loop {
@@ -258,15 +299,17 @@ fn get_closure(grammars_hashmap: &HashMap<String, Vec<Arc<GrammarItem>>>,
         match grammars_hashmap.get(&symbol_name) {
            Some(grammer_items) => {
                 for each_grammar in grammer_items.iter() {
-                    for terminal_atom in terminals.iter() {
-                        let lr_item = Arc::new(LRItem {
-                            stacktop: 0,
-                            terminal: terminal_atom.clone(),
-                            symbol: each_grammar.symbol.clone(),
-                            production: each_grammar.production.clone()
-                        });
-                        if !ret_cache.contains(&lr_item) {
-                            working_items.push(lr_item);
+                    for each_production in get_real_productions(&grammars_hashmap, &each_grammar.production).iter() {
+                        for terminal_atom in terminals.iter() {
+                            let lr_item = Arc::new(LRItem {
+                                stacktop: 0,
+                                terminal: terminal_atom.clone(),
+                                symbol: each_grammar.symbol.clone(),
+                                production: each_production.clone()
+                            });
+                            if !ret_cache.contains(&lr_item) {
+                                working_items.push(lr_item);
+                            }
                         }
                     }
                 }
@@ -559,7 +602,7 @@ pub fn create_table(grammars_hashmap: &HashMap<String, Vec<Arc<GrammarItem>>>, i
             }
         }
 
-        println!("action {:?}", new_action);
+        // println!("action {:?}", new_action);
         action_table.push(new_action);
         goto_table.push(new_goto);
 

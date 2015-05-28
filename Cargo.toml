@@ -16,4 +16,4 @@ name = "glr"
 path = "src/test.rs"
 
 [dependencies]
-regex = "0.1.30"
+regex = "0.1.32"
